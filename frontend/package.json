@@ -2,6 +2,7 @@
   "name": "cloudplatform-frontend",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "QoS-Aware Multi-Cloud Platform — React.js Frontend",
   "dependencies": {
     "react": "^18.2.0",
