@@ -1,10 +1,10 @@
 CREATE TABLE applications (
-    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id          VARCHAR(255) PRIMARY KEY,
     title       VARCHAR(255) NOT NULL,
     description TEXT,
     version     VARCHAR(50),
-    status      VARCHAR(30) NOT NULL DEFAULT 'INITIAL',  -- ENUM: INITIAL/DEPLOYING/DEPLOYED/UNDEPLOYING/TERMINATED/FAILED
-    owner_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status      VARCHAR(30) NOT NULL DEFAULT 'INITIAL',
+    owner_id    VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP
 );
@@ -15,9 +15,9 @@ CREATE TABLE application_tags (
 );
 
 CREATE TABLE cloud_configs (
-    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    app_id         UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-    cloud_provider VARCHAR(20) NOT NULL,  -- ENUM: AWS/AZURE
+    id             VARCHAR(255) PRIMARY KEY,
+    app_id         VARCHAR(255) NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+    cloud_provider VARCHAR(20) NOT NULL,
     instance_type  VARCHAR(50) NOT NULL,
     min_nodes      INTEGER NOT NULL DEFAULT 1,
     max_nodes      INTEGER NOT NULL DEFAULT 10,
@@ -27,13 +27,13 @@ CREATE TABLE cloud_configs (
 );
 
 CREATE TABLE qos_rules (
-    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    app_id            UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+    id                VARCHAR(255) PRIMARY KEY,
+    app_id            VARCHAR(255) NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
     metric_name       VARCHAR(100) NOT NULL,
     operator          VARCHAR(5) NOT NULL,
     threshold_value   DOUBLE PRECISION NOT NULL,
     duration_seconds  INTEGER DEFAULT 0,
-    action_type       VARCHAR(30) NOT NULL,  -- ENUM: SCALE_PODS_UP/DOWN/SCALE_NODES_UP/DOWN/NOTIFY
+    action_type       VARCHAR(30) NOT NULL,
     action_value      DOUBLE PRECISION,
     action_target     VARCHAR(20) DEFAULT 'all',
     cooldown_seconds  INTEGER DEFAULT 300,
@@ -41,25 +41,39 @@ CREATE TABLE qos_rules (
 );
 
 CREATE TABLE deployments (
-    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    app_id              UUID NOT NULL REFERENCES applications(id),
-    cloud_provider      VARCHAR(20) NOT NULL,  -- ENUM: AWS/AZURE
+    id                  VARCHAR(255) PRIMARY KEY,
+    app_id              VARCHAR(255) NOT NULL REFERENCES applications(id),
+    cloud_provider      VARCHAR(20) NOT NULL,
     cluster_endpoint    VARCHAR(255),
     prometheus_endpoint VARCHAR(255),
     node_count          INTEGER,
-    status              VARCHAR(30) NOT NULL DEFAULT 'PROVISIONING',  -- ENUM: PROVISIONING/ACTIVE/FAILED/TERMINATED
+    status              VARCHAR(30) NOT NULL DEFAULT 'PROVISIONING',
     terraform_workspace VARCHAR(500),
     deployed_at         TIMESTAMP,
     terminated_at       TIMESTAMP
 );
 
 CREATE TABLE scaling_events (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    app_id        UUID NOT NULL REFERENCES applications(id),
-    qos_rule_id   UUID REFERENCES qos_rules(id),
+    id            VARCHAR(255) PRIMARY KEY,
+    app_id        VARCHAR(255) NOT NULL REFERENCES applications(id),
+    qos_rule_id   VARCHAR(255) REFERENCES qos_rules(id),
     triggered_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     metric_value  DOUBLE PRECISION,
     action_type   VARCHAR(30) NOT NULL,
+    action_status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+    error_message TEXT
+);
+
+CREATE TABLE notifications (
+    id         VARCHAR(255) PRIMARY KEY,
+    user_id    VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    app_id     VARCHAR(255) REFERENCES applications(id) ON DELETE SET NULL,
+    type       VARCHAR(50) NOT NULL,
+    title      VARCHAR(255) NOT NULL,
+    message    TEXT NOT NULL,
+    is_read    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);    action_type   VARCHAR(30) NOT NULL,
     action_status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
     error_message TEXT
 );
