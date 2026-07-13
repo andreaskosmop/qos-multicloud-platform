@@ -1,0 +1,67 @@
+{
+  "name": "cloudplatform-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QoS-Aware Multi-Cloud Platform — React.js Frontend",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "typescript": "^5.4.0",
+
+    "axios": "^1.6.8",
+
+    "@tanstack/react-query": "^5.28.0",
+
+    "zustand": "^4.5.2",
+
+    "recharts": "^2.12.2",
+
+    "react-hook-form": "^7.51.0",
+    "zod": "^3.22.4",
+    "@hookform/resolvers": "^3.3.4",
+
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.365.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@types/node": "^20.11.30",
+
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.35",
+    "autoprefixer": "^10.4.19",
+
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.2.0",
+
+    "vitest": "^1.4.0",
+    "jsdom": "^24.0.0",
+    "@testing-library/react": "^14.2.2",
+    "@testing-library/jest-dom": "^6.4.2",
+
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext ts,tsx"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

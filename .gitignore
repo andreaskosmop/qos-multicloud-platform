@@ -1,0 +1,33 @@
+# ── Backend (Maven/Java) ────────────────────────────────
+target/
+*.class
+*.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# ── Frontend (Node) ──────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/build/
+.vite/
+
+# ── Environment / Secrets ────────────────────────────────
+.env
+*.pem
+
+# ── Terraform ────────────────────────────────────────────
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# ── IDE ───────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+
+# ── OS ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────────────
+*.log

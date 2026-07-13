@@ -1,0 +1,60 @@
+version: '3.8'
+
+# Σημείωση ασφαλείας: Σε παραγωγικό περιβάλλον θα έπρεπε να οριστούν
+# user-defined networks (αντί για το default bridge network), απομονώνοντας
+# το ζεύγος backend↔postgres σε ξεχωριστό δίκτυο από το ζεύγος frontend↔nginx.
+#
+# Έκδοση χωρίς SSL/TLS — μόνο HTTP. Κατάλληλο για τοπική ανάπτυξη/επίδειξη.
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: cloudplatform
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d cloudplatform"]
+      interval: 30s
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cloudplatform
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+    volumes:
+      - terraform_workspaces:/var/cloudplatform/workspaces  # Docker named volume
+      # Terraform binary ενσωματωμένο στο backend image (μέσω Dockerfile), όχι volume mapping
+      - ~/.kube:/root/.kube:ro
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    expose:
+      - "80"  # μόνο internal, δεν εκτίθεται δημόσια — το nginx μεσολαβεί
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+  terraform_workspaces:
