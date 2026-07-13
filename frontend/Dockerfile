@@ -16,7 +16,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Αντιγραφή του παραγόμενου build στον φάκελο που σερβίρει το nginx
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Ελαφριά ρύθμιση nginx μόνο για SPA routing (fallback σε index.html)
 # Σημείωση: αυτό ΔΕΝ είναι το κύριο nginx του docker-compose (που κάνει
