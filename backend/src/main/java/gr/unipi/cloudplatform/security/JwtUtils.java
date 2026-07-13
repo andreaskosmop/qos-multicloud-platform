@@ -3,14 +3,13 @@ package gr.unipi.cloudplatform.security;
 import gr.unipi.cloudplatform.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +17,7 @@ import java.util.function.Function;
 
 /**
  * Η κλάση JwtUtils διαχειρίζεται τη δημιουργία και επαλήθευση JWT tokens.
- * Χρησιμοποιεί τη βιβλιοθήκη jjwt (0.12.x) με HS256 (HMAC-SHA256) signing algorithm —
- * συμμετρικός αλγόριθμος όπου το ίδιο μυστικό κλειδί χρησιμοποιείται για
- * υπογραφή και επαλήθευση.
+ * Χρησιμοποιεί τη βιβλιοθήκη jjwt (0.12.x) με HS256 (HMAC-SHA256) signing algorithm.
  */
 @Component
 public class JwtUtils {
@@ -38,11 +35,11 @@ public class JwtUtils {
             claims.put("userId", user.getId());
         }
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -62,15 +59,15 @@ public class JwtUtils {
 
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
         return resolver.apply(
-                Jwts.parserBuilder()
-                        .setSigningKey(getSigningKey())
+                Jwts.parser()
+                        .verifyWith(getSigningKey())
                         .build()
-                        .parseClaimsJws(token)
-                        .getBody()
+                        .parseSignedClaims(token)
+                        .getPayload()
         );
     }
 
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 }
