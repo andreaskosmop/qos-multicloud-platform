@@ -11,7 +11,7 @@ CREATE TABLE applications (
 
 CREATE TABLE application_tags (
     application_id VARCHAR(255) NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-    tag            VARCHAR(50) NOT NULL
+    tags            VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE cloud_configs (
