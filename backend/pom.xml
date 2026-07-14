@@ -37,6 +37,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+             <!-- Jackson: σωστή σειριοποίηση Hibernate lazy-loaded proxies -->
+<dependency>
+    <groupId>com.fasterxml.jackson.datatype</groupId>
+    <artifactId>jackson-datatype-hibernate6</artifactId>
+    <version>2.15.4</version>
+</dependency>
 
         <!-- ── ORM / Database (Spring Data JPA + Hibernate + PostgreSQL + Flyway) ── -->
         <dependency>
